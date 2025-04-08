@@ -70,3 +70,108 @@ ORDER BY
 Here's what I got:
 
 ![Screenshot](https://github.com/N1fabrice/QueryRunners/blob/main/QUERY%20RESULT%201.jpg)
+
+
+
+2. Department Rankings: Two Ways to Rank Employees
+What we're doing: Ranking employees by salary within each department, using two different methods.
+SELECT 
+    employee_id,
+    first_name || ' ' || last_name AS employee_name,
+    department,
+    salary,
+    RANK() OVER(PARTITION BY department ORDER BY salary DESC) as rank_in_dept,
+    DENSE_RANK() OVER(PARTITION BY department ORDER BY salary DESC) as dense_rank_in_dept,
+    CASE 
+        WHEN RANK() OVER(PARTITION BY department ORDER BY salary DESC) != 
+             DENSE_RANK() OVER(PARTITION BY department ORDER BY salary DESC) 
+        THEN '← Difference found here!'
+        ELSE NULL
+    END as notice_the_difference
+FROM 
+    employees
+ORDER BY
+    department,
+    salary DESC;
+   What's the difference? Imagine we have two employees tied for 1st place:
+
+RANK() would put the next person at 3rd place (1, 1, 3, 4...)
+DENSE_RANK() keeps it tight with no gaps (1, 1, 2, 3...)
+Think of RANK() like Olympic medals (tied gold medalists are followed by bronze), while DENSE_RANK() is more like "you're the second-highest earner" even if you're tied with someone else.
+
+Here's what I got:
+![Screenshot](https://github.com/N1fabrice/QueryRunners/blob/main/QUERY%20RESULT%202.jpg)
+
+
+3. The Top Performers: Finding the Highest Salaries by Department
+What we're doing: Finding the top 3 highest-paid employees in each department.
+
+WITH ranked_employees AS (
+    SELECT 
+        employee_id,
+        first_name || ' ' || last_name AS employee_name,
+        department,
+        salary,
+        DENSE_RANK() OVER(PARTITION BY department ORDER BY salary DESC) as salary_rank
+    FROM 
+        employees
+)
+SELECT 
+    employee_id,
+    employee_name,
+    department,
+    salary,
+    salary_rank,
+    CASE 
+        WHEN salary_rank = 1 THEN '🥇 Top earner!'
+        WHEN salary_rank = 2 THEN '🥈 Runner-up'
+        WHEN salary_rank = 3 THEN '🥉 Third place'
+    END as salary_medal
+FROM 
+    ranked_employees
+WHERE 
+    salary_rank <= 3
+ORDER BY 
+    department, 
+    salary_rank;
+
+    Why we used DENSE_RANK(): If two people tie for first place, we want to make sure we get both of them plus the next highest earner (not skip to the 3rd person). This gets us the true top 3 salary levels, even with ties.
+
+Here's what I got:
+![Screenshot](https://github.com/N1fabrice/QueryRunners/blob/main/QUERY%20RESULT%203.jpg)
+
+4. The Veterans: Finding Who Joined First
+What we're doing: Finding the first 2 employees who joined each department.
+WITH ranked_by_hire_date AS (
+    SELECT 
+        employee_id,
+        first_name || ' ' || last_name AS employee_name,
+        department,
+        hire_date,
+        ROW_NUMBER() OVER(PARTITION BY department ORDER BY hire_date ASC) as hire_order
+    FROM 
+        employees
+)
+SELECT 
+    employee_id,
+    employee_name,
+    department,
+    hire_date,
+    CASE 
+        WHEN hire_order = 1 THEN 'Department Pioneer 🏆'
+        WHEN hire_order = 2 THEN 'Second to Join 🥈'
+    END as hire_status
+FROM 
+    ranked_by_hire_date
+WHERE 
+    hire_order <= 2
+ORDER BY 
+    department, 
+    hire_date;
+
+   Why we used ROW_NUMBER(): We want exactly 2 employees per department, even if they started on the same day. ROW_NUMBER() guarantees unique sequential numbers (1, 2, 3...) regardless of ties, so we always get exactly 2 people
+   Here's what I got:
+   ![Screenshot](https://github.com/N1fabrice/QueryRunners/blob/main/QUERY%20RESULT%204.jpg)
+
+   
+
