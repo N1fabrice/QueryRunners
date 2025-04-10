@@ -1,4 +1,4 @@
-**What's This All About?
+What's This All About?
 Hey there! This project dives into the fascinating world of SQL window functions using employee data. If you've ever struggled with complex SQL problems requiring multiple subqueries or self-joins, window functions might just be your new best friend!
 
 Think of window functions as a way to look through a "window" of related rows while still keeping all your original data intact. They let us analyze data in context - comparing values, ranking items, and calculating aggregates - all while preserving each individual record.
@@ -42,7 +42,7 @@ COMMIT;
 ```
 
 The Cool Stuff: 5 Powerful Window Function Techniques
-***1. Salary Comparison: Looking Forward and Backward
+1. Salary Comparison: Looking Forward and Backward
 What we're doing: Comparing each employee's salary with the previous and next employees to see if they're earning more or less.
 
 ```sql
@@ -77,7 +77,7 @@ Here's what I got:
 
 
 
-***2. Department Rankings: Two Ways to Rank Employees
+2. Department Rankings: Two Ways to Rank Employees
 What we're doing: Ranking employees by salary within each department, using two different methods.
 ```sql
 SELECT 
@@ -109,7 +109,7 @@ Here's what I got:
 ![Screenshot](https://github.com/N1fabrice/QueryRunners/blob/main/QUERY%20RESULT%202.jpg)
 
 
-***3. The Top Performers: Finding the Highest Salaries by Department
+3. The Top Performers: Finding the Highest Salaries by Department
 What we're doing: Finding the top 3 highest-paid employees in each department.
 ```sql
 WITH ranked_employees AS (
@@ -146,7 +146,7 @@ ORDER BY
 Here's what I got:
 ![Screenshot](https://github.com/N1fabrice/QueryRunners/blob/main/QUERY%20RESULT%203.jpg)
 
-***4. The Veterans: Finding Who Joined First
+4. The Veterans: Finding Who Joined First
 What we're doing: Finding the first 2 employees who joined each department.
 ```sql
 WITH ranked_by_hire_date AS (
@@ -182,7 +182,7 @@ ORDER BY
 
 
 
-***5. Salary Context: Department vs. Company-Wide Maximums
+5. Salary Context: Department vs. Company-Wide Maximums
 What we're doing: For each employee, we're showing how their salary compares to both their department's maximum and the company-wide maximum.
 ```sql
 SELECT 
