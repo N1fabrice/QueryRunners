@@ -14,6 +14,7 @@ hire_date: When they joined the company
 Setting Things Up
 First, we create our table and add some employees:
 
+```sql
 BEGIN
   EXECUTE IMMEDIATE 'DROP TABLE employees';
 EXCEPTION
@@ -38,11 +39,13 @@ INSERT ALL
 SELECT * FROM dual;
 
 COMMIT;
-
+```
 
 The Cool Stuff: 5 Powerful Window Function Techniques
 1. Salary Comparison: Looking Forward and Backward
 What we're doing: Comparing each employee's salary with the previous and next employees to see if they're earning more or less.
+
+```sql
 SELECT 
     employee_id,
     first_name || ' ' || last_name AS employee_name,
@@ -64,6 +67,7 @@ FROM
     employees
 ORDER BY 
     employee_id;
+```
 
    Why it's neat: The LAG function lets us peek at the previous employee's salary, while LEAD shows the next one's salary. It's like having eyes in the back and front of your head! This makes it super easy to spot trends in your data.
 
@@ -75,6 +79,7 @@ Here's what I got:
 
 2. Department Rankings: Two Ways to Rank Employees
 What we're doing: Ranking employees by salary within each department, using two different methods.
+```sql
 SELECT 
     employee_id,
     first_name || ' ' || last_name AS employee_name,
@@ -93,6 +98,7 @@ FROM
 ORDER BY
     department,
     salary DESC;
+```
    What's the difference? Imagine we have two employees tied for 1st place:
 
 RANK() would put the next person at 3rd place (1, 1, 3, 4...)
@@ -105,7 +111,7 @@ Here's what I got:
 
 3. The Top Performers: Finding the Highest Salaries by Department
 What we're doing: Finding the top 3 highest-paid employees in each department.
-
+```sql
 WITH ranked_employees AS (
     SELECT 
         employee_id,
@@ -134,7 +140,7 @@ WHERE
 ORDER BY 
     department, 
     salary_rank;
-
+```
     Why we used DENSE_RANK(): If two people tie for first place, we want to make sure we get both of them plus the next highest earner (not skip to the 3rd person). This gets us the true top 3 salary levels, even with ties.
 
 Here's what I got:
@@ -142,6 +148,7 @@ Here's what I got:
 
 4. The Veterans: Finding Who Joined First
 What we're doing: Finding the first 2 employees who joined each department.
+```sql
 WITH ranked_by_hire_date AS (
     SELECT 
         employee_id,
@@ -168,7 +175,7 @@ WHERE
 ORDER BY 
     department, 
     hire_date;
-
+```
    Why we used ROW_NUMBER(): We want exactly 2 employees per department, even if they started on the same day. ROW_NUMBER() guarantees unique sequential numbers (1, 2, 3...) regardless of ties, so we always get exactly 2 people
    Here's what I got:
    ![Screenshot](https://github.com/N1fabrice/QueryRunners/blob/main/QUERY%20RESULT%204.jpg)
