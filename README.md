@@ -173,5 +173,31 @@ ORDER BY
    Here's what I got:
    ![Screenshot](https://github.com/N1fabrice/QueryRunners/blob/main/QUERY%20RESULT%204.jpg)
 
-   
 
+
+5. Salary Context: Department vs. Company-Wide Maximums
+What we're doing: For each employee, we're showing how their salary compares to both their department's maximum and the company-wide maximum.
+```
+SELECT 
+    employee_id,
+    first_name || ' ' || last_name AS employee_name,
+    department,
+    salary,
+    MAX(salary) OVER(PARTITION BY department) as dept_max_salary,
+    MAX(salary) OVER() as company_max_salary,
+    ROUND((salary / MAX(salary) OVER(PARTITION BY department)) * 100, 2) || '%' as pct_of_dept_max,
+    ROUND((salary / MAX(salary) OVER()) * 100, 2) || '%' as pct_of_company_max
+FROM 
+    employees
+ORDER BY 
+    department, 
+    salary DESC;
+```
+The magic of PARTITION BY: Here's where window functions really shine - with one query, we can:
+
+Calculate the maximum salary in each department (using PARTITION BY department)
+Calculate the maximum salary across the entire company (no partition)
+Show percentages that put each salary in context
+
+Here's what I got:
+ ![Screenshot](https://github.com/N1fabrice/QueryRunners/blob/main/QUERY%20RESULT%205.jpg)
